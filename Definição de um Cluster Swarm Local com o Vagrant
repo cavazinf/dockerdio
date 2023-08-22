@@ -1,0 +1,88 @@
+nstale o Vagrant e o VirtualBox:
+
+Certifique-se de que você tenha o Vagrant e o VirtualBox instalados em seu sistema. Você pode baixá-los nos seguintes links:
+
+Vagrant: https://www.vagrantup.com/downloads
+VirtualBox: https://www.virtualbox.org/wiki/Downloads
+Crie um diretório para o projeto:
+
+Crie um diretório para o seu projeto do Vagrant e vá para ele usando o terminal.
+
+Inicialize um Vagrantfile:
+
+Inicialize um arquivo Vagrantfile com o seguinte comando:
+
+bash
+Copy code
+vagrant init
+Edite o Vagrantfile:
+
+Abra o arquivo Vagrantfile em um editor de texto e adicione as configurações necessárias para criar várias máquinas virtuais como nós no seu cluster Swarm.
+
+Aqui está um exemplo básico de um Vagrantfile com duas máquinas:
+
+ruby
+Copy code
+Vagrant.configure("2") do |config|
+  config.vm.define "manager" do |manager|
+    manager.vm.box = "ubuntu/bionic64"
+    manager.vm.network "private_network", type: "dhcp"
+    manager.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+    end
+  end
+
+  config.vm.define "worker" do |worker|
+    worker.vm.box = "ubuntu/bionic64"
+    worker.vm.network "private_network", type: "dhcp"
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+    end
+  end
+end
+Este exemplo define duas máquinas virtuais, uma como gerente (manager) e outra como trabalhador (worker).
+
+Inicie as máquinas virtuais:
+
+Execute o seguinte comando para criar e iniciar as máquinas virtuais:
+
+bash
+Copy code
+vagrant up
+Isso criará as máquinas virtuais conforme especificado no Vagrantfile.
+
+Conecte-se às máquinas virtuais:
+
+Use o seguinte comando para se conectar à máquina gerente:
+
+bash
+Copy code
+vagrant ssh manager
+Repita o processo para se conectar à máquina trabalhadora:
+
+bash
+Copy code
+vagrant ssh worker
+Configure o Swarm:
+
+Na máquina gerente, você pode iniciar um cluster Swarm com o Docker. Execute os seguintes comandos:
+
+bash
+Copy code
+docker swarm init --advertise-addr <endereço-de-rede-da-maquina-gerente>
+Isso iniciará o Swarm e fornecerá um token que você pode usar nas máquinas trabalhadoras para ingressar no cluster.
+
+Ingressar em nós de trabalho:
+
+Nas máquinas de trabalho, use o token gerado na etapa anterior para ingressar no cluster. Execute o comando que foi fornecido quando você executou docker swarm init na máquina gerente.
+
+Teste o cluster Swarm:
+
+Agora você tem um cluster Swarm local com as máquinas gerente e trabalhadora. Você pode criar serviços e implantações no cluster para executar aplicativos distribuídos.
+
+Por exemplo, você pode implantar um serviço de exemplo com o Docker:
+
+bash
+Copy code
+docker service create --replicas 2 --name my-web-app -p 80:80 nginx
+Isso implantará duas instâncias do servidor web Nginx no cluster Swarm.
